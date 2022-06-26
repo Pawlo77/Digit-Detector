@@ -1,0 +1,85 @@
+#:kivy 2.1.0
+
+<DefaultButton@Button>:
+    background_color: (0, 0, 0, 0)
+    font_size: max(min(root.height / 2, root.width / 5), 1)
+    text_size: self.size
+    color: "black"
+    valign: "middle"
+    halign: "center"
+
+<OptionButton@DefaultButton>:
+    canvas.before:
+        Color: 
+            rgba: (0, 0, 0, 1)
+        Line:
+            width: max(self.height / 60, 1)
+            rectangle: self.x, self.y, max(self.width, 1), max(self.height, 1)
+
+<ColorOption>:
+    canvas.before:
+        Color: 
+            rgba: root.choose_color
+        Rectangle:
+            pos: self.pos
+            size: self.size
+        Color:
+            rgba: (0, 0, 0, 1)
+        Line:
+            width: max(self.height / 60, 1)
+            rectangle: self.x, self.y, max(self.width, 1), max(self.height, 1)
+
+
+<MainScreen>:
+    board: board
+
+    canvas.before:
+        Color:
+            rgba: (255, 255, 255, 1)
+        Rectangle:
+            pos: self.pos
+            size: self.size
+        Color:
+            rgba: root.frame_color
+        Line:
+            width: max(self.height / 120, 1)
+            rectangle: self.width * 0.025, self.height * 0.15, self.width * 0.95, self.height * 0.75
+
+    ColorBar:
+        size_hint: (0.95, 0.05)
+        pos_hint: {"top": 0.975, "center_x": 0.5}
+
+    Board:
+        id: board
+        canvas.before:
+            Color:
+                rgba: (255, 255, 255, 1)
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        size_hint: (0.95, 0.75)
+        pos_hint: {"center_x": 0.5, "y": 0.15}
+
+    OptionButton:
+        text: "Scan"
+        pos_hint: {"right": 0.975, "y": 0.025}
+        size_hint: (0.2, 0.09)
+        on_press:
+            root.board.preprocess()
+
+    OptionButton:
+        text: "Reset"
+        pos_hint: {"x": 0.025, "y": 0.025}
+        size_hint: (0.2, 0.09)
+        on_press:
+            root.board.canvas.clear()
+
+    OptionButton:
+        text: "Rubber" if not root.rubber else "Paint"
+        pos_hint: {"center_x": 0.5, "y": 0.025}
+        size_hint: (0.2, 0.09)
+
+        on_press:
+            root.settings.rubber = not root.settings.rubber
+            root.rubber = root.settings.rubber
+        
