@@ -29,6 +29,26 @@
             width: max(self.height / 60, 1)
             rectangle: self.x, self.y, max(self.width, 1), max(self.height, 1)
 
+<DefaultLabel@Label>:
+    font_size: max(min(self.height, self.width), 1)
+    text_size: self.size
+    valign: "middle"
+    halign: "center"
+
+<Popup>:
+    size_hint: (0.4, 0.6)
+    FloatLayout: 
+        DefaultLabel:
+            text: root.text
+            pos_hint: {"center_x": 0.5, "y": 0.15}
+            size_hint: (0.95, 0.8)
+        OptionButton:
+            text: "Fine"
+            pos_hint: {"center_x": 0.5, "y": 0.025}
+            size_hint: (0.4, 0.1)
+            on_press:
+                root.dismiss()
+
 
 <MainScreen>:
     board: board

@@ -1,13 +1,25 @@
 from kivy.uix.gridlayout import GridLayout
 from kivy.graphics import Color, Ellipse, Line
 from kivy.uix.widget import Widget
-from kivy.properties import ColorProperty
+from kivy.properties import ColorProperty, StringProperty
+from kivy.uix.popup import Popup
 
 from settings import settings
-from processing import process
+from processing import predictor
+
+
+class MyPopup(Popup):
+    text = StringProperty("")
+
+    def __init__(self, text, **kwargs):
+        super(MyPopup, self).__init__(**kwargs)
+        self.text = text
 
 
 class Board(Widget):
+    checking = None
+    img_name = "canvas.png"
+
     def on_touch_down(self, touch):
         if self.collide_point(touch.x, touch.y):
             if settings.rubber:
@@ -26,9 +38,14 @@ class Board(Widget):
         if self.collide_point(touch.x, touch.y):
             touch.ud["line"].points += [touch.x, touch.y]
 
-    def preprocess(self):
-        self.export_to_png("canvas.png")
-        res = process()
+    def preprocess(self):      
+        self.export_to_png(self.img_name)
+        res = predictor.predict(self.img_name)
+        
+        if res == "Wrong data provided":
+            MyPopup(title="Unable to detect.", text=res).open()
+        else:
+            MyPopup(title="Result:", text=res).open()
 
 
 class ColorBar(GridLayout):
