@@ -1,53 +1,83 @@
-from PIL import Image, ImageChops, ImageOps
 from tensorflow import keras
 import numpy as np
+import cv2
+import os
 
+
+model_name = "model1.h5"
 
 class Predictor:
-    model = keras.models.load_model("model.h5")
+    model = keras.models.load_model(model_name)
+    padding = 30
+    id_ = 0
+    save_ = False
 
-    def predict(self, img_name):
+    def predict(self, stream):
         try:
-            img = Image.open(img_name)    
-            img = self.to_greyscale(img)
-            img = self.crop(img)
-            img = self.resize(img)
-            img.show()
-            img = np.asarray(img)
-            img = img[np.newaxis, :, :, np.newaxis]
+            img_array = np.asarray(bytearray(stream.read()), dtype="uint8")
+            img_array = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
+            img_array = self.preprocess(img_array)
+
+            if self.save_:
+                self.save(img_array)
             
-            prediction = self.model.predict(img)
+            img_array = img_array[np.newaxis, ..., np.newaxis]
+            prediction = self.model.predict(img_array)
             prediction = self.decode_label(prediction)
-        except:
+        except Exception as e:
+            print(e)
             return "Wrong data provided"
         else:
             return str(prediction)
 
+    def preprocess(self, img_array):
+        if model_name == "model1.h5":
+            img_array = self.to_white_black_radical(img_array)
+        else:
+            img_array = self.to_white_black(img_array)
+        img_array = self.crop(img_array)
+        img_array = self.add_padding(img_array)
+        img_array = self.resize(img_array)
+        return img_array
+
     # crop image only to non-empty data
-    def crop(self, img):
-        bg = Image.new(img.mode, img.size, 255) # create white image of the same size as img
-        diff = ImageChops.difference(img, bg)
-        diff = ImageChops.add(diff, diff, 2.0, -100)
+    def crop(self, img_array):
+        coords = img_array == 0.
+        drop_cols = np.all(coords, axis=0)
+        drop_rows = np.all(coords, axis=1)
 
-        bbox = diff.getbbox()
-        if bbox:
-            return img.crop(bbox)
+        first_col = drop_cols.argmin()
+        first_row = drop_rows.argmin()
+        last_col = len(drop_cols) - drop_cols[::-1].argmin()
+        last_row = len(drop_rows) - drop_rows[::-1].argmin()
 
-    def resize(self, img):
-        return img.resize((28, 28)) # mnist image size
+        return img_array[first_row:last_row, first_col:last_col]
 
-    def to_greyscale(self, img):
-        img = ImageOps.grayscale(img)
-        pixels = img.load()
+    def resize(self, img_array):
+        return cv2.resize(img_array, dsize=(28, 28))
 
-        for x in range(img.size[0]):
-            for y in range(img.size[1]):
-                if pixels[x, y] != 255:
-                    pixels[x, y] = 0
-        return img
+    def to_white_black_radical(self, img_array):
+        mins_ = np.min(img_array, axis=-1)
+        mins_ = np.where(mins_ == 255, 0., 1.)
+        mins_ = mins_.astype(np.float32)
+        return mins_
+
+    def to_white_black(self, img_array):
+        grayValue = 0.07 * img_array[:,:,2] + 0.72 * img_array[:,:,1] + 0.21 * img_array[:,:,0]
+        gray_img = grayValue.astype(np.float32)
+        return gray_img
 
     def decode_label(self, one_hots):
         return np.argmax(one_hots)
 
+    def add_padding(self, img_array):
+        return np.pad(img_array, self.padding)
 
+    def save(self, img_array):
+        path = os.path.join("samples", f"sample_{self.id_}.npy")
+        self.id_ += 1
+        np.save(path, img_array)
+
+
+os.makedirs("samples", exist_ok=True)
 predictor = Predictor()

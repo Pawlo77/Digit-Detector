@@ -4,6 +4,8 @@ from kivy.uix.widget import Widget
 from kivy.properties import ColorProperty, StringProperty
 from kivy.uix.popup import Popup
 
+from io import BytesIO
+
 from settings import settings
 from processing import predictor
 
@@ -17,9 +19,6 @@ class MyPopup(Popup):
 
 
 class Board(Widget):
-    checking = None
-    img_name = "canvas.png"
-
     def on_touch_down(self, touch):
         if self.collide_point(touch.x, touch.y):
             if settings.rubber:
@@ -38,9 +37,12 @@ class Board(Widget):
         if self.collide_point(touch.x, touch.y):
             touch.ud["line"].points += [touch.x, touch.y]
 
-    def preprocess(self):      
-        self.export_to_png(self.img_name)
-        res = predictor.predict(self.img_name)
+    def preprocess(self):    
+        stream = BytesIO()  
+        img = self.export_as_image()
+        img.save(stream, fmt="png")
+
+        res = predictor.predict(stream)
         
         if res == "Wrong data provided":
             MyPopup(title="Unable to detect.", text=res).open()
