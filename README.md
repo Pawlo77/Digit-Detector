@@ -20,6 +20,15 @@ to be the only one that generizes well.<br>
 Technical talk:
 <ul>
     <li>All 5 models were trained on MNIST or datasets like it (ex MNIST extended etc were checked for better performance, however failed against original one)</li>
+    <b><li>How does it work?
+        <ol>
+            <li>You write a digint</li>
+            <li>You press scan</li>
+            <li>Program scans a canvas and crops the smallest possible rectangle that contains entire drawing</li>
+            <li>Rectangle is resized to 28x28 and feed to the Neural Network</li>
+            <li>Neural Network's response is being brought to you in a pop-up window</li>
+        </ol>
+    </li></b>
     <li>Precise models descriptions:
         <ul>
             <li>final_model2 - Sequential Neural Network trained in Tensorflow (keras) with around 700k params, used normal MNIST for 11 epochs</li>
