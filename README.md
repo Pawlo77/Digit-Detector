@@ -1,42 +1,57 @@
-# Simple digint classifier
+# Simple Digit Classifier
 
-You are provided with a simple paint app that allows<br> 
-you to reset it's state, earse stuff and change brush<br>
-collors. After pressing "Scan" it will pop up a window<br>
-with model's guess on the drawn digit. For it to work<br>
-propertly, the following conditions must be meet:<br>
-<ul>
-    <li>Digit must be the only drawn object on the board</li>
-    <li>The smaller the digit is - the thicker it's 28x28 version<br>
-        would be - the more accurate the prediction would be<br></li>
-</ul>        
-To increase it's performance you can change paint_size in settings.py.<br>
-<hr>
-Having commited couple of tested models, even though all of them outscore<br>
-default used model 1 (on small 100-samples test dataset), model 1 seems<br>
-to be the only one that generizes well.<br>
+## How it Works
+This project provides a simple paint app that allows you to draw digits and receive predictions on the drawn digit. Here's how it works:
 
-<hr>
-Technical talk:
-<ul>
-    <li>All 5 models were trained on MNIST or datasets like it (ex MNIST extended etc were checked for better performance, however failed against original one)</li>
-    <b><li>How does it work?
-        <ol>
-            <li>You write a digint</li>
-            <li>You press scan</li>
-            <li>Program scans a canvas and crops the smallest possible rectangle that contains entire drawing</li>
-            <li>Rectangle is resized to 28x28 and feed to the Neural Network</li>
-            <li>Neural Network's response is being brought to you in a pop-up window</li>
-        </ol>
-    </li></b>
-    <li>Precise models descriptions:
-        <ul>
-            <li>final_model2 - Sequential Neural Network trained in Tensorflow (keras) with around 700k params, used normal MNIST for 11 epochs</li>
-            <li>final_model1 - Sequential Neural Network trained in Tensorflow (keras) with around 2.700k params, used normal MNIST for 18 epochs</li>
-            <li>final_model2 - Sequential Neural Network trained in Tensorflow (keras) with around 700k params, used normal MNIST</li>
-            <li>final_model1 - Sequential Neural Network trained in Tensorflow (keras) with around 2.700 params, used normal MNIST for 22 epochs</li>
-            <li>final_model1 - Sequential Neural Network trained in Tensorflow (keras) with around 2.700k params, used normal MNIST for 12 epochs</li>
-        </ul>
-        Models 2-4 are a little bit different, but all of them are much deeper than first one, therefore the lag before prediction in the kivy app is larger <br><i>(their scores on paper tend to be a little bit higher than first one, however in practice first one is the best choice performance and accuracy - wise)</i>
-    </li>
- </ul>
+1. You draw a digit on the canvas.
+2. Press the "Scan" button.
+3. The program scans the canvas and crops the smallest possible rectangle that contains the entire drawing.
+4. The cropped rectangle is resized to 28x28 pixels.
+5. The resized image is fed into a trained Neural Network model.
+6. The model predicts the digit based on the input image.
+7. The predicted digit is displayed in a pop-up window.
+
+## Paint App
+The paint app allows you to:
+- Draw digits on a canvas
+- Reset the canvas
+- Erase drawings
+- Change brush colors
+
+Once you press the "Scan" button, a pop-up window will display the model's prediction for the drawn digit.
+
+## Requirements
+To obtain accurate predictions, please ensure the following conditions are met:
+- The drawn digit should be the only object on the board.
+- The smaller the digit, the thicker its 28x28 version will be, resulting in more accurate predictions.
+
+## Performance Enhancement
+You can improve the app's performance by adjusting the `paint_size` parameter in the `settings.py` file.
+
+---
+
+Regarding the trained models:
+
+## Model Selection
+Several models were tested, but the default used model (Model 1) outperformed the others, demonstrating good generalization on a small 100-sample test dataset.
+
+## Model Descriptions
+- `final_model2`: A Sequential Neural Network trained in TensorFlow (Keras) with around 700k parameters. It was trained on the normal MNIST dataset for 11 epochs.
+- `final_model1`: A Sequential Neural Network trained in TensorFlow (Keras) with around 2,700k parameters. It was trained on the normal MNIST dataset for 18 epochs.
+- `final_model2`: A Sequential Neural Network trained in TensorFlow (Keras) with around 700k parameters. It was trained on the normal MNIST dataset.
+- `final_model1`: A Sequential Neural Network trained in TensorFlow (Keras) with around 2,700k parameters. It was trained on the normal MNIST dataset for 22 epochs.
+- `final_model1`: A Sequential Neural Network trained in TensorFlow (Keras) with around 2,700k parameters. It was trained on the normal MNIST dataset for 12 epochs.
+
+Models 2-4 differ slightly, but all of them are deeper than the first model. However, the first model performs better in terms of both performance and accuracy, making it the recommended choice.
+
+---
+
+Technical Details:
+
+- Training Data: All five models were trained on datasets similar to MNIST, such as MNIST Extended. However, the original MNIST dataset yielded the best performance.
+
+This project offers a practical learning experience for implementing machine learning algorithms and provides various functionalities for data preprocessing, model building, and evaluation.
+
+---
+
+**Note**: For more detailed information and instructions on using the project, please refer to the project's documentation.
